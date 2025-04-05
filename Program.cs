@@ -402,6 +402,12 @@ namespace MsgRuntimePatcher {
     0xD2, 0xBB, 0xB4, 0xCE, 0xA1, 0xA3
             }, "%s was crushed!", "msg_duelloss2");
 
+
+// test only
+
+
+
+
             CloseHandle(handle);
             Console.WriteLine("Done. Closing");
         }

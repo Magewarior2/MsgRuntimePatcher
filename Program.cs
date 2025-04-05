@@ -30,8 +30,8 @@ namespace MsgRuntimePatcher {
         static async Task Main(string[] args) {
 
             Console.WriteLine("MsgRuntimePatcher v1.0");
-            Console.WriteLine("waiting 10 minutes before Patching LoadMsg_1.exe...");
-            await DelayAsync(10 * 60 * 1000); // 10 minutes = 600,000 milliseconds
+            Console.WriteLine("waiting 5 minutes before Patching LoadMsg_1.exe...");
+            await DelayAsync(5 * 60 * 1000); 
             Console.WriteLine("Patching LoadMsg_1.exe...");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

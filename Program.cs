@@ -12,6 +12,7 @@ namespace MsgRuntimePatcher
         const int PROCESS_VM_READ = 0x0010;
         const int PROCESS_VM_WRITE = 0x0020;
         const int PROCESS_QUERY_INFORMATION = 0x0400;
+        const uint PAGE_EXECUTE_READWRITE = 0x40;
 
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
@@ -2560,21 +2561,6 @@ namespace MsgRuntimePatcher
     0xCD, 0xE6, 0xBC, 0xD2, 0xC9, 0xBE, 0xBD, 0xC7
             }, "del role", "msg_delete_role");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             CloseHandle(handle);
             Console.WriteLine("Done. Closing");
         }
@@ -2586,47 +2572,68 @@ namespace MsgRuntimePatcher
 
         static void PatchString(IntPtr handle, Process proc, byte[] aobPattern, string newText, string label)
         {
-            long startAddress = proc.MainModule.BaseAddress.ToInt64();
+            try
+            {
+                PatchSafeInlineString(handle, proc, aobPattern, newText, label);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Exception while patching {label}: {ex.Message}");
+                Log($"Exception while patching {label}: {ex}");
+            }
+        }
+
+        private static void PatchSafeInlineString(IntPtr handle, Process proc, byte[] aobPattern, string newText, string label)
+        {
+            long start = proc.MainModule.BaseAddress.ToInt64();
             byte[] buffer = new byte[proc.MainModule.ModuleMemorySize];
 
-            if (!ReadProcessMemory(handle, (IntPtr)startAddress, buffer, buffer.Length, out _))
+            if (!ReadProcessMemory(handle, (IntPtr)start, buffer, buffer.Length, out _))
             {
-                Console.WriteLine($"Failed to read memory for {label}.");
-                Log($"Failed to read memory for {label} at 0x{startAddress:X}.");
+                Console.WriteLine($"[!] Failed to read memory for {label}");
+                Log($"[!] Failed to read memory for {label}");
                 return;
             }
 
             int index = FindPattern(buffer, aobPattern);
             if (index == -1)
             {
-                Console.WriteLine($"Pattern {label} not found.");
-                Log($"Pattern {label} not found at 0x{startAddress:X}.");
+                Console.WriteLine($"[!] Pattern not found for {label}");
+                Log($"[!] Pattern not found for {label}");
                 return;
             }
 
-            long patchAddress = startAddress + index;
-            byte[] patchData = Encoding.GetEncoding(936).GetBytes(newText);
-            Array.Resize(ref patchData, aobPattern.Length);
-
-            const uint PAGE_EXECUTE_READWRITE = 0x40;
-            uint oldProtect;
-
-            if (!VirtualProtectEx(handle, (IntPtr)patchAddress, (UIntPtr)patchData.Length, PAGE_EXECUTE_READWRITE, out oldProtect))
+            // Check how much space is available after pattern (until next null or non-empty byte)
+            int maxLen = 0;
+            for (int i = index; i < buffer.Length && maxLen < 512; i++, maxLen++)
             {
-                Console.WriteLine($"Failed to change memory protection for {label}.");
-                Log($"Failed to change memory protection for {label} at 0x{patchAddress:X}.");
-                return;
+                if (buffer[i] != 0x00 && buffer[i] < 0x20) break; // avoid jumping into executable junk
             }
 
-            if (!WriteProcessMemory(handle, (IntPtr)patchAddress, patchData, patchData.Length, out _))
+            byte[] newBytes = Encoding.GetEncoding(936).GetBytes(newText + "\0");
+            if (newBytes.Length > maxLen)
             {
-                Console.WriteLine($"Failed to write memory for {label}.");
-                Log($"Failed to write memory for {label} at 0x{patchAddress:X}.");
+                Console.WriteLine($"[!] Not enough space for {label} (needed {newBytes.Length}, found {maxLen}). Skipping.");
+                Log($"[!] Not enough space for {label} (needed {newBytes.Length}, found {maxLen}). Skipping.");
                 return;
             }
 
-            Console.WriteLine($"Patched {label} at 0x{patchAddress:X}");
-            //Log($"Patched {label} at 0x{patchAddress:X} to {newText}");
+            long patchAddr = start + index;
+            if (!VirtualProtectEx(handle, (IntPtr)patchAddr, (UIntPtr)newBytes.Length, PAGE_EXECUTE_READWRITE, out _))
+            {
+                Console.WriteLine($"[!] Failed to unprotect memory for {label}");
+                Log($"[!] Failed to unprotect memory for {label}");
+                return;
+            }
+
+            if (!WriteProcessMemory(handle, (IntPtr)patchAddr, newBytes, newBytes.Length, out _))
+            {
+                Console.WriteLine($"[!] Failed to write new string for {label}");
+                Log("[!] Failed to write new string for {label}");
+                return;
+            }
+
+            Console.WriteLine($"[✓] Inline patched '{label}' with '{newText}'");
         }
 
         public static void Log(string text)

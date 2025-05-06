@@ -803,6 +803,16 @@ namespace MsgRuntimePatcher
     0xD3, 0xE8, 0xB7, 0xE2, 0xBA, 0xC5, 0xA1, 0xA3
             }, "[%s] impersonated [%s] - ban flagged.", "msg_impersonation");
 
+            // 获击杀额外经验%u。
+            // BBF1BBF7C9B1B6EECDE2BEADD1E92575A1A3
+            PatchString(handle, proc, new byte[]
+            {
+    0xBB, 0xF1, 0xBB, 0xF7, 0xC9, 0xB1, 0xB6, 0xEE, 0xCD, 0xE2,
+    0xBE, 0xAD, 0xD1, 0xE9, 0x25, 0x75, 0xA1, 0xA3    // ← Jumlah byte: 18
+            }, "Receive %u EXP.", "msg_bonus_exp_kill");
+
+
+
             // PK值继续增加，将会延长黑名惩罚的时间。
             PatchString(handle, proc, new byte[]
             {

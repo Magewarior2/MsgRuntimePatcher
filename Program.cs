@@ -54,9 +54,10 @@ namespace MsgRuntimePatcher
 / /\/\ \ (_| | (_| |  __/\  /\  / (_| | |  | | (_) | |  / __/ 
 \/    \/\__,_|\__, |\___| \/  \/ \__,_|_|  |_|\___/|_| |_____|
               |___/                                           
+
                
                 ");
-            Console.WriteLine("English MSG Patcher v1.0");
+            Console.WriteLine("MsgRuntimePatcher v1.0");
 
 
 
@@ -64,7 +65,7 @@ namespace MsgRuntimePatcher
             string[] spinner = { "◐", "◓", "◑", "◒" };
             Console.WriteLine("Starting countdown before patching...");
 
-            for (int i = 10 * 60; i >= 0; i--)
+            for (int i = 4 * 60; i >= 0; i--)
             {
                 string time = $"{i / 60:D2}:{i % 60:D2}";
                 string spin = spinner[i % spinner.Length];
@@ -74,13 +75,16 @@ namespace MsgRuntimePatcher
                 await Task.Delay(1000);
             }
 
-            Console.Title = "English MSG Patcher V1.0 | Patching in progress...";
             Console.WriteLine("\nCountdown finished. Proceeding with patch...");
 
 
 
 
 
+
+
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             Process[] processes = Process.GetProcessesByName("LoadMsg_1");
             if (processes.Length == 0)

@@ -33,13 +33,51 @@ namespace MsgRuntimePatcher
 
         static async Task Main(string[] args)
         {
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.WriteLine(@"
 
-            Console.WriteLine("MsgRuntimePatcher v1.0");
-            Console.WriteLine("waiting 10 minutes before Patching LoadMsg_1.exe...");
-            await DelayAsync(10 * 60 * 1000); // 10 minutes = 600,000 milliseconds
-            Console.WriteLine("Patching LoadMsg_1.exe...");
+    ___             __      _ _                               
+   /   \_   _  __ _/ _\ ___| (_)_ __   __ _ _ __              
+  / /\ / | | |/ _` \ \ / _ \ | | '_ \ / _` | '__|             
+ / /_//| |_| | (_| |\ \  __/ | | |_) | (_| | |                
+/___,'  \__,_|\__,_\__/\___|_|_| .__/ \__,_|_|                
+                               |_|                            
+         ___                                                  
+        ( _ )                                                 
+        / _ \/\                                               
+       | (_>  <                                               
+        \___/\/                                               
+                                                              
+                         __    __           _           ____  
+  /\/\   __ _  __ _  ___/ / /\ \ \__ _ _ __(_) ___  _ _|___ \ 
+ /    \ / _` |/ _` |/ _ \ \/  \/ / _` | '__| |/ _ \| '__|__) |
+/ /\/\ \ (_| | (_| |  __/\  /\  / (_| | |  | | (_) | |  / __/ 
+\/    \/\__,_|\__, |\___| \/  \/ \__,_|_|  |_|\___/|_| |_____|
+              |___/                                           
+               
+                ");
+            Console.WriteLine("English MSG Patcher v1.0");
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+
+
+            string[] spinner = { "|", "/", "-", "\\" };
+            Console.WriteLine("Starting countdown before patching...");
+            for (int i = 10 * 60; i >= 0; i--)
+            {
+                string time = $"{i / 60:D2}:{i % 60:D2}";
+                string spin = spinner[i % spinner.Length];
+
+                Console.Title = $"English MSG Patcher V1.0 | Countdown: {time}";
+                Console.Write($"\rPatching will start in {time}... {spin} ");
+                await Task.Delay(1000);
+            }
+            Console.Title = "English MSG Patcher V1.0 | Patching in progress...";
+            Console.WriteLine("\nCountdown finished. Proceeding with patch...");
+
+
+
+
 
             Process[] processes = Process.GetProcessesByName("LoadMsg_1");
             if (processes.Length == 0)

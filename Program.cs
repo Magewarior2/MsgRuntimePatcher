@@ -36,7 +36,7 @@ namespace MsgRuntimePatcher
 
             Console.WriteLine("MsgRuntimePatcher v1.0");
             Console.WriteLine("waiting 10 minutes before Patching LoadMsg_1.exe...");
-            //   await DelayAsync(10 * 60 * 1000); // 10 minutes = 600,000 milliseconds
+            await DelayAsync(10 * 60 * 1000); // 10 minutes = 600,000 milliseconds
             Console.WriteLine("Patching LoadMsg_1.exe...");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -3388,7 +3388,7 @@ namespace MsgRuntimePatcher
     0xA3, 0xAC, 0xB5, 0xC3, 0xB5, 0xBD, 0xC9, 0xCF,
     0xC6, 0xB7, 0xC9, 0xF1, 0xC6, 0xF7, 0x20, 0x25,
     0x73
-            }, "Got gear %s", "msg_identify_elite"); // ✔️ 17 bytes
+            }, "Got %s", "msg_identify_elite"); // ✔️ 17 bytes
 
             // 鉴定成功，得到极品 %s
             // BCF8B6A8B3C9B9A6A3ACB5C3B5BDBCABC6B7202573
@@ -3504,7 +3504,7 @@ namespace MsgRuntimePatcher
             {
     0xB5, 0xC3, 0xB5, 0xBD, 0xCE, 0xEF, 0xC6, 0xB7,
     0x25, 0x73, 0xA1, 0xA3
-            }, "Got %s.", "msg_got_item"); // ✔️ 12 bytes
+            }, "Picked %s.", "msg_got_item"); // ✔️ 12 bytes
 
 
             // 得到未鉴定物品。
@@ -3513,7 +3513,7 @@ namespace MsgRuntimePatcher
             {
     0xB5, 0xC3, 0xB5, 0xBD, 0xCE, 0xB4, 0xBC, 0xF8,
     0xB6, 0xA8, 0xCE, 0xEF, 0xC6, 0xB7, 0xA1, 0xA3
-            }, "Unknown.", "msg_got_unidentified"); // ✔️ 18 bytes
+            }, "Unknown item.", "msg_got_unidentified"); // ✔️ 18 bytes
 
 /*
             // %s(%u) mapid=%u x=%d,y=%d 拾取物品:[%s, id=%u, type=%u], dur=%d, max_dur=%d,newgem=%d

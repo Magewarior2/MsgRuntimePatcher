@@ -61,19 +61,22 @@ namespace MsgRuntimePatcher
 
 
 
-            string[] spinner = { "|", "/", "-", "\\" };
+            string[] spinner = { "◐", "◓", "◑", "◒" };
             Console.WriteLine("Starting countdown before patching...");
+
             for (int i = 10 * 60; i >= 0; i--)
             {
                 string time = $"{i / 60:D2}:{i % 60:D2}";
                 string spin = spinner[i % spinner.Length];
 
-                Console.Title = $"English MSG Patcher V1.0 | Countdown: {time}";
+                Console.Title = $"{spin} English MSG Patcher V1.0 | Countdown: {time}";
                 Console.Write($"\rPatching will start in {time}... {spin} ");
                 await Task.Delay(1000);
             }
+
             Console.Title = "English MSG Patcher V1.0 | Patching in progress...";
             Console.WriteLine("\nCountdown finished. Proceeding with patch...");
+
 
 
 
